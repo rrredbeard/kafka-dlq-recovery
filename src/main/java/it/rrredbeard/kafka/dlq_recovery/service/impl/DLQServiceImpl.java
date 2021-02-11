@@ -5,6 +5,7 @@ import it.rrredbeard.kafka.dlq_recovery.stream.AppInputSource;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cloud.stream.binder.BinderHeaders;
+import org.springframework.cloud.stream.binder.kafka.KafkaMessageChannelBinder;
 import org.springframework.integration.support.MessageBuilder;
 import org.springframework.kafka.support.KafkaHeaders;
 import org.springframework.lang.NonNull;
@@ -37,7 +38,7 @@ public class DLQServiceImpl implements DLQService {
 		log.info("HANDLE DLQ -- [type = {}, retryAttempt = {}, exception = {}] | {}",
 			headers.get(EVENT_TYPE),
 			retries,
-			headers.get(KafkaHeaders.REPLY_TOPIC),
+			headers.get(KafkaMessageChannelBinder.X_EXCEPTION_FQCN),
 			failed.getPayload()
 		);
 

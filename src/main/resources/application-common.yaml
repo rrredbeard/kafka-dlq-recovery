@@ -15,7 +15,7 @@ logging:
 
 spring:
   application:
-    name: ${APP_NAME:dlq-recovery-${random.long}}
+    name: ${APP_NAME:dlq-recovery-app}
   main:
     banner-mode: off
   jpa:
