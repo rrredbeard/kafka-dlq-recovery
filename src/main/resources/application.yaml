@@ -1,0 +1,36 @@
+logging:
+  level:
+    it.rrredbeard: debug
+
+spring:
+  profiles:
+    include: 'common'
+
+  cloud:
+    stream:
+      default:
+        group: kcg-${spring.application.name:${random.uuid}}
+        consumer:
+          concurrency: ${KAFKA_CONCURRENCY:1}
+      bindings:
+        input:
+          destination: "order"
+          consumer:
+            max-attempts: 1
+        input-producer:
+          destination: ${spring.cloud.stream.bindings.input.destination}
+        dlq:
+          destination: ${spring.cloud.stream.kafka.bindings.input.consumer.dlqName}
+      kafka:
+        binder:
+          brokers: ${KAFKA_BROKERS:localhost:9092}
+          headers: ${KAFKA_CUSTOM_HEADERS}
+        bindings:
+          input:
+            consumer:
+              dlqName: "${spring.cloud.stream.bindings.input.destination}.dlq"
+          dlq:
+            consumer:
+              enableDlq: false
+
+

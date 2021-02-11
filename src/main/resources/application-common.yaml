@@ -1,0 +1,74 @@
+management:
+  endpoints.web:
+    base-path: /management
+    exposure:
+      include: info, health, metrics, prometheus
+
+debug: false
+logging:
+  level:
+    root: warn
+    org.apache.kafka.common.utils.AppInfoParser: error # clientId
+  pattern:
+    console: '%clr(%d{yyyy-MM-dd HH:mm:ss.SSS}){faint} %clr(${LOG_LEVEL_PATTERN:-%5p}) %clr(${PID:- }){magenta} %clr(---){faint} %clr([%15.15t]){faint} %clr(%-40.40logger{39}){cyan} %clr(:){faint} %m%n${LOG_EXCEPTION_CONVERSION_WORD:-%wEx}'
+
+
+spring:
+  application:
+    name: ${APP_NAME:dlq-recovery-${random.long}}
+  main:
+    banner-mode: off
+  jpa:
+    open-in-view: false
+    properties:
+      hibernate:
+      show_sql: false
+      format_sql: false
+  #JSON
+  jackson:
+    deserialization:
+      fail-on-ignored-properties: false
+  #Kafka
+  cloud:
+    stream:
+      kafka:
+        default:
+          consumer:
+            enableDlq: true
+            autoCommitOnError: true
+            autoCommitOffset: true
+            max-attempts: 3
+            backOffInitialInterval: 1000
+            backOffMaxInterval: 10000
+            backOffMultiplier: 2.0
+        #            batch-mode: false
+        #            retryableExceptions:
+        #              org.springframework.transaction.CannotCreateTransactionException: true
+        #              org.hibernate.exception.JDBCConnectionException: true
+        #              java.sql.SQLTransientConnectionException: true
+        #              javax.validation.ValidationException: false
+        #              java.lang.IllegalStateException: false
+        binder:
+          default:
+            consumer:
+              enableDlq: true
+          auto-create-topics: ${AUTO_CREATE_TOPICS:true}
+          consumer-properties:
+            key.deserializer: org.apache.kafka.common.serialization.StringDeserializer
+            client.id: ${HOSTNAME:${spring.application.name}}
+          producer-properties:
+            key.serializer: org.apache.kafka.common.serialization.StringSerializer
+            client.id: ${HOSTNAME:${spring.application.name}}
+          configuration:
+            isolation.level: read_committed
+          transaction:
+            transactionIdPrefix: ${HOSTNAME:${random.uuid}}-tx-
+            producer:
+              configuration:
+                retries: 3
+                acks: all
+
+server:
+  port: 8080
+  tomcat:
+    connection-timeout: -1
