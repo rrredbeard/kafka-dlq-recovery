@@ -1,0 +1,43 @@
+logging:
+  level:
+    it.rrredbeard: debug
+
+spring:
+  profiles:
+    include: 'common'
+
+  application:
+    name: ${APP_NAME}
+
+  cloud:
+    stream:
+      bindings:
+        # INPUT
+        input:
+          destination: ${TOPIC_IN}
+          group: kcg-${spring.application.name:${random.uuid}}
+          consumer:
+            concurrency: ${TOPIC_PART_NO:1}
+            defaultRetryable: false
+            maxAttempts: 1
+        # OUTPUT
+        output:
+          destination: ${TOPIC_OUT}
+      kafka:
+        binder:
+          brokers: ${KAFKA_BROKERS:localhost:9092}
+          headers: ${KAFKA_CUSTOM_HEADERS}
+        bindings:
+          input:
+            consumer:
+              enableDlq: false
+              autoCommitOffset: true
+              autoCommitOnError: true
+
+dlq-recovery-app:
+  logDurationEnabled: true
+  logDlqExceptionEnabled: true
+  allowedHeaders:
+    - x-event-type
+    - x-event-version
+    - x-event-retries
