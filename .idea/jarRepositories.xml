@@ -7,6 +7,26 @@
       <option name="url" value="https://repo.maven.apache.org/maven2" />
     </remote-repository>
     <remote-repository>
+      <option name="id" value="spring-release" />
+      <option name="name" value="Spring Maven RELEASE Repository" />
+      <option name="url" value="http://repo.spring.io/libs-release" />
+    </remote-repository>
+    <remote-repository>
+      <option name="id" value="repository.springframework.maven.release" />
+      <option name="name" value="Spring Framework Maven Release Repository" />
+      <option name="url" value="http://maven.springframework.org/milestone/" />
+    </remote-repository>
+    <remote-repository>
+      <option name="id" value="spring-milestone" />
+      <option name="name" value="Spring Maven MILESTONE Repository" />
+      <option name="url" value="http://repo.spring.io/libs-milestone" />
+    </remote-repository>
+    <remote-repository>
+      <option name="id" value="org.springframework" />
+      <option name="name" value="org.springframework" />
+      <option name="url" value="http://maven.springframework.org/snapshot" />
+    </remote-repository>
+    <remote-repository>
       <option name="id" value="central" />
       <option name="name" value="Maven Central repository" />
       <option name="url" value="https://repo1.maven.org/maven2" />

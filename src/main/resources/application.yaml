@@ -34,10 +34,10 @@ spring:
               autoCommitOffset: true
               autoCommitOnError: true
 
-dlq-recovery-app:
-  logDurationEnabled: true
-  logDlqExceptionEnabled: true
-  allowedHeaders:
-    - x-event-type
-    - x-event-version
-    - x-event-retries
+#dlq-recovery-app:
+#  logDurationEnabled: true
+#  logDlqExceptionEnabled: true
+#  allowedHeaders:
+#    - x-event-type
+#    - x-event-version
+#    - x-event-retries
