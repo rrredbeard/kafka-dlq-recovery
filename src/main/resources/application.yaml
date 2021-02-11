@@ -6,21 +6,23 @@ spring:
   profiles:
     include: 'common'
 
+  application:
+    name: ${APP_NAME}
+
   cloud:
     stream:
-      default:
-        group: kcg-${spring.application.name:${random.uuid}}
-        consumer:
-          concurrency: ${KAFKA_CONCURRENCY:1}
       bindings:
+        # INPUT
         input:
-          destination: "order"
+          destination: ${TOPIC_IN}
+          group: kcg-${spring.application.name:${random.uuid}}
           consumer:
-            max-attempts: 1
-        input-producer:
-          destination: ${spring.cloud.stream.bindings.input.destination}
-        dlq:
-          destination: ${spring.cloud.stream.kafka.bindings.input.consumer.dlqName}
+            concurrency: ${TOPIC_PART_NO:1}
+            defaultRetryable: false
+            maxAttempts: 1
+        # OUTPUT
+        output:
+          destination: ${TOPIC_OUT}
       kafka:
         binder:
           brokers: ${KAFKA_BROKERS:localhost:9092}
@@ -28,9 +30,14 @@ spring:
         bindings:
           input:
             consumer:
-              dlqName: "${spring.cloud.stream.bindings.input.destination}.dlq"
-          dlq:
-            consumer:
               enableDlq: false
+              autoCommitOffset: true
+              autoCommitOnError: true
 
-
+dlq-recovery-app:
+  logDurationEnabled: true
+  logDlqExceptionEnabled: true
+  allowedHeaders:
+    - x-event-type
+    - x-event-version
+    - x-event-retries

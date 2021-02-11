@@ -1,8 +1,7 @@
 package it.rrredbeard.kafka.dlq_recovery.config;
 
-import it.rrredbeard.kafka.dlq_recovery.stream.AppInputSource;
-import it.rrredbeard.kafka.dlq_recovery.stream.AppSink;
-import it.rrredbeard.kafka.dlq_recovery.stream.DLQSink;
+import it.rrredbeard.kafka.dlq_recovery.DLQRecoveryApplication;
+import it.rrredbeard.kafka.dlq_recovery.stream.DLQProcessor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.common.TopicPartition;
 import org.springframework.beans.factory.annotation.Value;
@@ -26,7 +25,7 @@ import static java.lang.String.format;
 
 @Slf4j
 @Configuration
-@EnableBinding({AppSink.class, DLQSink.class, AppInputSource.class})
+@EnableBinding({DLQProcessor.class})
 public class KafkaConfig {
 
 	private static final String TX_ID_PREFIX_PROP = "spring.cloud.stream.kafka.binder.transaction.transactionIdPrefix";
@@ -39,7 +38,7 @@ public class KafkaConfig {
 
 	@Bean
 	public DlqPartitionFunction partitionFunction() {
-		return (group, record, ex) -> record.partition() % 2;
+		return (group, record, ex) -> 0;
 	}
 
 	@Bean
@@ -63,7 +62,9 @@ public class KafkaConfig {
 
 		transactionManager.setTransactionIdPrefix(newTxIdPrefix);
 
-		log.debug("LOADED KafkaTransactionManager[txIdPrefix = {}]", newTxIdPrefix);
+		DLQRecoveryApplication.logConfig(
+			format("KafkaTransactionManager(txIdPrefix=%s)", newTxIdPrefix)
+		);
 
 		return transactionManager;
 	}
