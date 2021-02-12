@@ -2,7 +2,6 @@ package it.rrredbeard.kafka.dlq_recovery;
 
 import it.rrredbeard.kafka.dlq_recovery.config.AppConfig;
 import it.rrredbeard.kafka.dlq_recovery.service.DLQService;
-import it.rrredbeard.kafka.dlq_recovery.stream.DLQProcessor;
 import it.rrredbeard.kafka.dlq_recovery.utils.BaseConsumer;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -50,8 +49,8 @@ public class DLQRecoveryApplication extends BaseConsumer {
 	private final DLQService dlqService;
 
 	@Transactional
-	@StreamListener(INPUT)
 	@SendTo(OUTPUT)
+	@StreamListener(target = INPUT, copyHeaders = "false")
 	public Message<?> onEvent(@NonNull Message<?> message) { // NOSONAR
 
 		final Optional<Message<?>> output;

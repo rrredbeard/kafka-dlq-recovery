@@ -1,6 +1,7 @@
 package it.rrredbeard.kafka.dlq_recovery.config;
 
 import it.rrredbeard.kafka.dlq_recovery.DLQRecoveryApplication;
+
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -18,6 +19,9 @@ public class AppConfig {
 
 	@PostConstruct
 	public final void logMe() {
+		//noinspection ResultOfMethodCallIgnored
+		getAllowedHeaders();
+
 		DLQRecoveryApplication.logConfig(this);
 	}
 
@@ -25,5 +29,9 @@ public class AppConfig {
 	private boolean logDlqExceptionEnabled = false;
 
 	private Set<String> allowedHeaders = new HashSet<>();
+	private int allowedHeadersSize;
 
+	public int getAllowedHeadersSize() {
+		return (allowedHeadersSize = allowedHeaders.size()); // NOSONAR
+	}
 }
