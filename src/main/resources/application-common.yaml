@@ -49,8 +49,8 @@ spring:
         binder:
           default:
             consumer:
-              enableDlq: true
-          auto-create-topics: ${AUTO_CREATE_TOPICS:true}
+              enableDlq: false
+          auto-create-topics: ${AUTO_CREATE_TOPICS:false}
           consumer-properties:
             key.deserializer: org.apache.kafka.common.serialization.StringDeserializer
             client.id: ${HOSTNAME:${spring.application.name}}

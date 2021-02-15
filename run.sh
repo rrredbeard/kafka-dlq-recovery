@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 
+export AUTO_CREATE_TOPICS="false"
+
+
 export KAFKA_BROKERS=""
 
 #export APP_NAME=

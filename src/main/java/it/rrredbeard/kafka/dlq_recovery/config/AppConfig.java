@@ -25,11 +25,13 @@ public class AppConfig {
 		DLQRecoveryApplication.logConfig(this);
 	}
 
+	private String consumerGroupName;
+
 	private boolean logDurationEnabled = false;
 	private boolean logDlqExceptionEnabled = false;
 
-	private Set<String> allowedHeaders = new HashSet<>();
 	private int allowedHeadersSize;
+	private Set<String> allowedHeaders = new HashSet<>();
 
 	public int getAllowedHeadersSize() {
 		return (allowedHeadersSize = allowedHeaders.size()); // NOSONAR
