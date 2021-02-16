@@ -11,6 +11,8 @@ import javax.annotation.PostConstruct;
 import java.util.HashSet;
 import java.util.Set;
 
+import static net.logstash.logback.encoder.org.apache.commons.lang3.StringUtils.isNoneBlank;
+
 @Getter
 @Setter
 @ToString
@@ -25,7 +27,6 @@ public class AppConfig {
 		DLQRecoveryApplication.logConfig(this);
 	}
 
-	private String consumerGroupName;
 
 	private boolean logDurationEnabled = false;
 	private boolean logDlqExceptionEnabled = false;
@@ -33,7 +34,15 @@ public class AppConfig {
 	private int allowedHeadersSize;
 	private Set<String> allowedHeaders = new HashSet<>();
 
-	public int getAllowedHeadersSize() {
+	private String noRetryHeader;
+	private String noRetryValue;
+
+	public final int getAllowedHeadersSize() {
 		return (allowedHeadersSize = allowedHeaders.size()); // NOSONAR
 	}
+
+	public final boolean noRetryEntryExists(){
+		return isNoneBlank(noRetryHeader, noRetryValue);
+	}
+
 }

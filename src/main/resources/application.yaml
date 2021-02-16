@@ -1,6 +1,6 @@
 logging:
   level:
-    it.rrredbeard: debug
+    it.rrredbeard: ${APP_LOG_LEVEL:info}
 
 spring:
   profiles:
@@ -35,7 +35,8 @@ spring:
               autoCommitOnError: true
 
 dlq-recovery-app:
-  consumerGroupName: ${spring.cloud.stream.bindings.input.group}
   logDurationEnabled: ${LOG_DURATION_ENABLED:false}
   logDlqExceptionEnabled: ${LOG_EXCEPTION_ENABLED:false}
   allowedHeaders: ${ALLOWED_HEADERS}
+  noRetryHeader: x-no-retry-${spring.application.name}
+  noRetryValue: ${spring.cloud.stream.bindings.input.group}
