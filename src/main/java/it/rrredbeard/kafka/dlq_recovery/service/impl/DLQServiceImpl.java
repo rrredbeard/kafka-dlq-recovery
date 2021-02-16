@@ -17,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.nio.charset.StandardCharsets;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicLong;
 
 @Slf4j
 @Service
@@ -25,12 +26,14 @@ import java.util.Optional;
 public class DLQServiceImpl implements DLQService {
 
 	private final AppConfig config;
+	private final AtomicLong msgCounter = new AtomicLong(0);
 
 	@NonNull
 	@Override
 	@Transactional
 	public Optional<Message<?>> handle(@NonNull Message<?> inbound) {
 
+		long prog = -1;
 		Message<?> outbound = null;
 
 		final MessageBuilder<?> builder;
@@ -89,6 +92,8 @@ public class DLQServiceImpl implements DLQService {
 
 			outbound = builder.build();
 
+			prog = msgCounter.incrementAndGet();
+
 		} catch (RuntimeException ex) {
 			log.error("FATAL ERROR ON [topic = {}, partition = {}, offset = {}]",
 				headers.get(KafkaHeaders.RECEIVED_TOPIC),
@@ -100,9 +105,10 @@ public class DLQServiceImpl implements DLQService {
 		}
 
 		if (outbound != null && log.isInfoEnabled()) {
-			log.info("HANDLE FROM [{}-{}] | {}",
+			log.info("HANDLE FROM [{}-{}][prog = {}] | {}",
 				headers.get(KafkaHeaders.RECEIVED_TOPIC),
 				headers.get(KafkaHeaders.RECEIVED_PARTITION_ID),
+				prog,
 				outbound.getHeaders()
 			);
 		}
