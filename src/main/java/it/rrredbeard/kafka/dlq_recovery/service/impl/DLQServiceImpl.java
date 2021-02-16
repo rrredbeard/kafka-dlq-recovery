@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.nio.charset.StandardCharsets;
+import java.util.Objects;
 import java.util.Optional;
 
 @Slf4j
@@ -34,6 +35,7 @@ public class DLQServiceImpl implements DLQService {
 
 		final MessageBuilder<?> builder;
 		final MessageHeaders headers = inbound.getHeaders();
+		final boolean noRetryEntryExists = config.noRetryEntryExists();
 
 		if (config.isLogDlqExceptionEnabled() || log.isTraceEnabled()) {
 			Optional
@@ -43,6 +45,24 @@ public class DLQServiceImpl implements DLQService {
 					"HANDLE DLQ EXCEPTION {}",
 					new String((byte[]) v, StandardCharsets.UTF_8)
 				));
+		}
+
+		if (noRetryEntryExists) {
+			final boolean existsNoRetryMarker =
+				Objects.equals(
+					config.getNoRetryValue(),
+					headers.get(config.getNoRetryHeader())
+				);
+
+			if (existsNoRetryMarker) {
+				log.warn("EVENT ALREADY TRIED [topic = {}, partition = {}, offset = {}]",
+					headers.get(KafkaHeaders.RECEIVED_TOPIC),
+					headers.get(KafkaHeaders.RECEIVED_PARTITION_ID),
+					headers.get(KafkaHeaders.OFFSET)
+				);
+
+				return Optional.empty();
+			}
 		}
 
 		try {
@@ -55,6 +75,10 @@ public class DLQServiceImpl implements DLQService {
 							  KafkaHeaders.MESSAGE_KEY,
 							  headers.get(KafkaHeaders.RECEIVED_MESSAGE_KEY)
 						  );
+
+			if (noRetryEntryExists) {
+				builder.setHeader(config.getNoRetryHeader(), config.getNoRetryValue());
+			}
 
 			for (String customHeader : config.getAllowedHeaders()) {
 				builder.setHeader(

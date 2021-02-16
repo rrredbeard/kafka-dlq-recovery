@@ -1,13 +1,13 @@
 logging:
   level:
-    it.rrredbeard: debug
+    it.rrredbeard: ${APP_LOG_LEVEL:info}
 
 spring:
   profiles:
     include: 'common'
 
   application:
-    name: ${APP_NAME}
+    name: ${APP_NAME:dlq-app-${random.uuid}}
 
   cloud:
     stream:
@@ -34,10 +34,9 @@ spring:
               autoCommitOffset: true
               autoCommitOnError: true
 
-#dlq-recovery-app:
-#  logDurationEnabled: true
-#  logDlqExceptionEnabled: true
-#  allowedHeaders:
-#    - x-event-type
-#    - x-event-version
-#    - x-event-retries
+dlq-recovery-app:
+  logDurationEnabled: ${LOG_DURATION_ENABLED:false}
+  logDlqExceptionEnabled: ${LOG_EXCEPTION_ENABLED:false}
+  allowedHeaders: ${ALLOWED_HEADERS}
+  noRetryHeader: x-no-retry-${spring.application.name}
+  noRetryValue: ${spring.cloud.stream.bindings.input.group}
